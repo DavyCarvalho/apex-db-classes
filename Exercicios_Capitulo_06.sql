@@ -39,7 +39,7 @@ SELECT COUNT(*) FROM usuarios
 SELECT * FROM usuarios WHERE idade <= 17
 
 -- Questão 10
-SELECT * FROM usuarios WHERE email LIKE '%gmail%'
+SELECT COUNT(*) FROM usuarios WHERE email LIKE '%gmail%'
 
 -- Questão 11
 SELECT MAX(idade) FROM usuarios 
