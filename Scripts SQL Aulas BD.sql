@@ -104,7 +104,7 @@ SELECT Cidade, SUM(Idade) FROM Clientes GROUP BY Cidade
 
 CREATE TABLE Cpfs (
 	Id INT IDENTITY(1,1),
-	Numero VARCHAR(12) UNIQUE, -- A PALAVRA CHAVE 'UNIQUE' NÃO DEIXA QUE VALORES SEJAM REPETIDOS NESSA COLUNA
+	Numero VARCHAR(12) UNIQUE,--A PALAVRA CHAVE 'UNIQUE' NÃO DEIXA QUE VALORES SEJAM REPETIDOS NESSA COLUNA
 
 	PRIMARY KEY(Id)
 );
@@ -112,19 +112,19 @@ CREATE TABLE Cpfs (
 CREATE TABLE Habitantes ( 
 	Id INT IDENTITY(1,1),
 	Nome VARCHAR(30),
-	Cpf INT UNIQUE,
+	CpfId INT UNIQUE,
 	
 	PRIMARY KEY(Id),
-	FOREIGN KEY(Cpf) REFERENCES Cpfs(Id)
+	FOREIGN KEY(CpfId) REFERENCES Cpfs(Id)
 );
 
 INSERT INTO Cpfs VALUES 
 ('12345678900'),
-('12345678900'); -- UNIQUE !!!
+('12345678901'); -- UNIQUE !!!
 
 INSERT INTO Habitantes VALUES
-('Davy', 3),
-('Milly', 4),
+('Davy', 1),
+('Milly', 2),
 ('Gamora', 4); -- UNIQUE !!!
 
 --1:N (1 Cidade pertence a 1 Estado e 1 Estado possui N Cidades)
@@ -139,10 +139,10 @@ CREATE TABLE Estados (
 CREATE TABLE Cidades (
 	Id INT IDENTITY(1,1),
 	Nome VARCHAR(30),
-	Estado INT,
+	EstadoId INT,
 
 	PRIMARY KEY(Id),
-	FOREIGN KEY(Estado) REFERENCES Estados(Id)
+	FOREIGN KEY(EstadoId) REFERENCES Estados(Id)
 );
 
 INSERT INTO Estados VALUES 
@@ -166,7 +166,7 @@ CREATE TABLE Atores (
 
 CREATE TABLE Filmes (
 	Id INT IDENTITY(1,1),
-	Nome VARCHAR(30)
+	Nome VARCHAR(30),
 
 	PRIMARY KEY(Id)
 );
@@ -174,11 +174,11 @@ CREATE TABLE Filmes (
 CREATE TABLE AtorFilme (
 	Id INT IDENTITY(1,1),
 	AtorId INT,
-	FilmeId INT
+	FilmeId INT,
 	
 	PRIMARY KEY(Id),
-	FOREIGN KEY(atorId) REFERENCES atores(Id),
-	FOREIGN KEY(filmeId) REFERENCES filmes(Id)
+	FOREIGN KEY(AtorId) REFERENCES Atores(Id),
+	FOREIGN KEY(FilmeId) REFERENCES Filmes(Id)
 );
 
 INSERT INTO Atores VALUES
@@ -212,10 +212,10 @@ CREATE TABLE Cidades (
 CREATE TABLE Clientes (
 	Id INT IDENTITY(1,1),
 	Nome VARCHAR(15),
-	Cidade INT,
+	CidadeId INT,
 	
 	PRIMARY KEY(Id),
-	FOREIGN KEY(Cidade) REFERENCES Cidades (Id)
+	FOREIGN KEY(CidadeId) REFERENCES Cidades(Id)
 );
 
 INSERT INTO Cidades (Nome) VALUES
@@ -224,7 +224,7 @@ INSERT INTO Cidades (Nome) VALUES
 ('Joinville'),
 ('Indaial');
 
-INSERT INTO Clientes (Nome, Cidade) VALUES
+INSERT INTO Clientes (Nome, CidadeId) VALUES
 ('Davy', 1),
 ('Júlio', 3),
 ('Larissa', 1),
@@ -233,33 +233,38 @@ INSERT INTO Clientes (Nome, Cidade) VALUES
 SELECT
 	Clientes.Nome,
 	Cidades.Nome
-FROM Clientes
-INNER JOIN Cidades
-ON Clientes.Cidade = Cidades.Id;
+FROM Clientes INNER JOIN Cidades
+ON Clientes.CidadeId = Cidades.Id;
 
 SELECT
-	Cidades.Nome as Cidade,
-	COUNT(Clientes.Nome) as quantidadeDeMoradores
-FROM Cidades
-LEFT JOIN Clientes
-ON Clientes.Cidade = Cidades.Id
+	Cidades.Nome as Cidade, -- APELIDO
+	COUNT(Clientes.Nome) as quantidadeDeMoradores -- APELIDO
+FROM Cidades LEFT JOIN Clientes
+ON Clientes.CidadeId = Cidades.Id
 GROUP BY Cidades.Nome
 
 SELECT
 	Cidades.Nome as NomeDaCidade,
 	Clientes.Nome as NomeDoCliente
-FROM Clientes
-RIGHT JOIN Cidades
-ON Clientes.Cidade = Cidades.Id;
+FROM Clientes RIGHT JOIN Cidades
+ON Clientes.CidadeId = Cidades.Id;
 
 --Capítulo 09 - Views
 
 --Criar view
-CREATE VIEW visao AS
-SELECT Nome, Cidade FROM Clientes;
+ALTER TABLE Clientes ADD Idade INT;
+UPDATE Clientes SET Idade = 30
+
+CREATE VIEW NovaView AS
+SELECT
+	Cidades.Nome as Cidade, -- APELIDO
+	COUNT(Clientes.Nome) as quantidadeDeMoradores -- APELIDO
+FROM Cidades LEFT JOIN Clientes
+ON Clientes.CidadeId = Cidades.Id
+GROUP BY Cidades.Nome
 
 --Executar view
-SELECT * FROM visao;
+SELECT * FROM NovaView;
 
 --Excluir view
 DROP VIEW visao;
